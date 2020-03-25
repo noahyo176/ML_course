@@ -51,7 +51,7 @@ def ml_loop():
             comm.send_instruction(scene_info.frame, PlatformAction.SERVE_TO_LEFT)
             old_ball_0 = scene_info.ball[0]
             old_ball_1 = scene_info.ball[1]
-            old_ball_x_speed = scene_info.ball_speed[0]
+            old_ball_x_speed = -7
             counter = 0
             ball_served = True
 
@@ -59,9 +59,9 @@ def ml_loop():
         # elif (old_ball_0 >= scene_info.ball[0]):
         # elif old_ball_1 <= scene_info.ball[1] or \
         #     scene_info.platform[1] - scene_info.ball[1] <= 120:
-        elif scene_info.ball_speed[1] == 7 or \
+        elif (scene_info.ball[1] - old_ball_1) > 0 or \
              scene_info.platform[1] - scene_info.ball[1] <= 120 or \
-             scene_info.ball_speed[0] != old_ball_x_speed:
+             (scene_info.ball[0] - old_ball_0) != old_ball_x_speed:
 
             # print("boolean:\n")
             # print(  scene_info.ball_speed[1] == -7, " " \
@@ -69,12 +69,12 @@ def ml_loop():
             #       , scene_info.ball_speed[1] != old_ball_x_speed, "\n")
 
             # calculate the where center should be through reflection theorem
-            if scene_info.ball_speed[0] == 7:
+            if (scene_info.ball[0] - old_ball_0) >= 0:
                 center_should_be_ori = scene_info.ball[0] + (scene_info.platform[1] - scene_info.ball[1])
                 if center_should_be_ori > 200:
                     center_should_be_ori = 400 - center_should_be_ori
                 center_trim = center_should_be_ori - (center_should_be_ori % 10) 
-            elif scene_info.ball_speed[0] == -7:
+            elif (scene_info.ball[0] - old_ball_0) < 0:
                 center_should_be_ori = abs(scene_info.ball[0] - (scene_info.platform[1] - scene_info.ball[1]))
                 center_trim = center_should_be_ori - (center_should_be_ori % 10) 
             
@@ -110,7 +110,7 @@ def ml_loop():
 
             old_ball_0 = scene_info.ball[0]
             old_ball_1 = scene_info.ball[1]
-            old_ball_x_speed = scene_info.ball_speed[0]
+            old_ball_x_speed = scene_info.ball[0] - old_ball_0
 
 
             # setoff is set to be on the center of platform
