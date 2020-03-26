@@ -115,18 +115,18 @@ def ml_loop():
 
             # setoff is set to be on the center of platform
             # if platform's X is not equal to the "center_should_be_ori", move it to either right and left
-            # if (scene_info.platform[0] > center_trim):
-            #    comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+            if (scene_info.platform[0] > center_trim):
+               comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
                     
-            # elif (scene_info.platform[0] < center_trim):
-            #    comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
+            elif (scene_info.platform[0] < center_trim):
+               comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
 
         # reset the platform to original position to gain more time for following moves
         elif (scene_info.platform[0] != 75):
             if (scene_info.platform[0] > 75):
-                # comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
             elif (scene_info.platform[0] < 75):
-                # comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
 
         else:
             # print(old_ball_0, " ", scene_info.ball[0], " ", scene_info.ball[0] - old_ball_0)
@@ -142,6 +142,6 @@ def ml_loop():
             old_ball_0 = scene_info.ball[0]
             old_ball_1 = scene_info.ball[1]
 
-            # comm.send_instruction(scene_info.frame, PlatformAction.NONE)
+            comm.send_instruction(scene_info.frame, PlatformAction.NONE)
 '''
 '''
