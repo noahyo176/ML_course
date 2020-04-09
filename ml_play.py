@@ -1,14 +1,11 @@
 """
 The template of the main script of the machine learning process
 """
-import pickle
-import numpy as np
+
 import games.arkanoid.communication as comm
 from games.arkanoid.communication import ( \
     SceneInfo, GameStatus, PlatformAction
 )
-import os.path as path
-
 
 def ml_loop():
     """
@@ -25,40 +22,19 @@ def ml_loop():
     # === Here is the execution order of the loop === #
     # 1. Put the initialization code here.
     ball_served = False
-    filename = path.join(path.dirname(__file__), "save/clf_KMeans_BallAndDirection.pickle")
-    with open(filename, 'rb') as file:
-        clf = pickle.load(file)
 
     # 2. Inform the game process that ml process is ready before start the loop.
     comm.ml_ready()
-    
-    s = [93,93]
-    def get_direction(ball_x,ball_y,ball_pre_x,ball_pre_y):
-        VectorX = ball_x - ball_pre_x
-        VectorY = ball_y - ball_pre_y
-        if(VectorX>=0 and VectorY>=0):
-            return 0
-        elif(VectorX>0 and VectorY<0):
-            return 1
-        elif(VectorX<0 and VectorY>0):
-            return 2
-        elif(VectorX<0 and VectorY<0):
-            return 3
-        
 
+    # Self_defined variable
+
+
+    s = [93, 93]
     # 3. Start an endless loop.
     while True:
         # 3.1. Receive the scene information sent from the game process.
         scene_info = comm.get_scene_info()
-        feature = []
-        feature.append(scene_info.ball[0])
-        feature.append(scene_info.ball[1])
-        feature.append(scene_info.platform[0])
-        
-        feature.append(get_direction(feature[0],feature[1],s[0],s[1]))
-        s = [feature[0], feature[1]]
-        feature = np.array(feature)
-        feature = feature.reshape((-1,4))
+
         # 3.2. If the game is over or passed, the game process will reset
         #      the scene and wait for ml process doing resetting job.
         if scene_info.status == GameStatus.GAME_OVER or \
@@ -75,18 +51,68 @@ def ml_loop():
         # 3.4. Send the instruction for this frame to the game process
         if not ball_served:
             comm.send_instruction(scene_info.frame, PlatformAction.SERVE_TO_LEFT)
+            old_ball_0 = scene_info.ball[0]
+            old_ball_1 = scene_info.ball[1]
+            old_ball_x_speed = -7
+            counter = 0
             ball_served = True
-        else:
-                
-            y = clf.predict(feature)
-            
-            if y == 0:
-                comm.send_instruction(scene_info.frame, PlatformAction.NONE)
-                print('NONE')
-            elif y == 1:
-                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
-                print('LEFT')
-            elif y == 2:
-                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
-                print('RIGHT')
 
+        # platform adjastment starts when the Y gap between platform and ball is 300
+        elif (scene_info.ball[1] - old_ball_1) > 0 or \
+             scene_info.platform[1] - scene_info.ball[1] <= 120 or \
+             (scene_info.ball[0] - old_ball_0) != old_ball_x_speed:     # with reflection
+
+            print('---------------------------------------------------------')
+            print((scene_info.ball[1] - old_ball_1) > 0, " ", \
+                   scene_info.platform[1] - scene_info.ball[1] <= 12, " ", \
+                  (scene_info.ball[0] - old_ball_0) != old_ball_x_speed, "\n", \
+                   old_ball_0, " ", old_ball_1, " ", old_ball_x_speed, "\n", \
+                   scene_info.ball[0], " ", scene_info.ball[1], "\n", \
+                   scene_info.platform[0], " ", scene_info.platform[1])
+
+
+            # calculate the where center should be through reflection theorem
+            if (scene_info.ball[0] - old_ball_0) >= 0:
+                center_should_be_ori = scene_info.ball[0] + (scene_info.platform[1] - scene_info.ball[1])
+                if center_should_be_ori > 200:
+                    center_should_be_ori = 400 - center_should_be_ori
+                center_trim = center_should_be_ori - (center_should_be_ori % 10) 
+
+            elif (scene_info.ball[0] - old_ball_0) < 0:
+                center_should_be_ori = abs(scene_info.ball[0] - (scene_info.platform[1] - scene_info.ball[1]))
+                center_trim = center_should_be_ori - (center_should_be_ori % 10) 
+            
+
+            old_ball_x_speed = scene_info.ball[0] - old_ball_0
+            old_ball_0 = scene_info.ball[0]
+            old_ball_1 = scene_info.ball[1]
+
+
+            # setoff is set to be on the center of platform
+            # if platform's X is not equal to the "center_should_be_ori", move it to either right and left
+            if (scene_info.platform[0] > center_trim):
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+                print("LEFT")
+                    
+            elif (scene_info.platform[0] < center_trim):
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
+                print("RIGHT")
+
+        # reset the platform to original position to gain more time for following moves
+        elif (scene_info.platform[0] != 75):
+            if (scene_info.platform[0] > 75):
+                old_ball_0 = scene_info.ball[0]
+                old_ball_1 = scene_info.ball[1]
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
+                print("LEFT")
+            elif (scene_info.platform[0] < 75):
+                old_ball_0 = scene_info.ball[0]
+                old_ball_1 = scene_info.ball[1]
+                comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
+                print("RIGHT")
+
+        else:
+            old_ball_0 = scene_info.ball[0]
+            old_ball_1 = scene_info.ball[1]
+            comm.send_instruction(scene_info.frame, PlatformAction.NONE)
+            print("NONE")
