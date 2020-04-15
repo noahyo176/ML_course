@@ -62,25 +62,27 @@ def ml_loop():
              scene_info.platform[1] - scene_info.ball[1] <= 120 or \
              (scene_info.ball[0] - old_ball_0) != old_ball_x_speed:     # with reflection
 
-            print('---------------------------------------------------------')
+            '''print('---------------------------------------------------------')
             print((scene_info.ball[1] - old_ball_1) > 0, " ", \
                    scene_info.platform[1] - scene_info.ball[1] <= 12, " ", \
                   (scene_info.ball[0] - old_ball_0) != old_ball_x_speed, "\n", \
                    old_ball_0, " ", old_ball_1, " ", old_ball_x_speed, "\n", \
                    scene_info.ball[0], " ", scene_info.ball[1], "\n", \
-                   scene_info.platform[0], " ", scene_info.platform[1])
+                   scene_info.platform[0], " ", scene_info.platform[1])'''
 
 
             # calculate the where center should be through reflection theorem
-            if (scene_info.ball[0] - old_ball_0) >= 0:
+            if (scene_info.ball[0] - old_ball_0) >= 0: # right
                 center_should_be_ori = scene_info.ball[0] + (scene_info.platform[1] - scene_info.ball[1])
                 if center_should_be_ori > 200:
                     center_should_be_ori = 400 - center_should_be_ori
                 center_trim = center_should_be_ori - (center_should_be_ori % 10) 
+                # center_trim = center_should_be_ori
 
-            elif (scene_info.ball[0] - old_ball_0) < 0:
+            elif (scene_info.ball[0] - old_ball_0) < 0: # left
                 center_should_be_ori = abs(scene_info.ball[0] - (scene_info.platform[1] - scene_info.ball[1]))
                 center_trim = center_should_be_ori - (center_should_be_ori % 10) 
+                # center_trim = center_should_be_ori
             
 
             old_ball_x_speed = scene_info.ball[0] - old_ball_0
@@ -90,13 +92,18 @@ def ml_loop():
 
             # setoff is set to be on the center of platform
             # if platform's X is not equal to the "center_should_be_ori", move it to either right and left
-            if (scene_info.platform[0] > center_trim):
+            if (scene_info.platform[0] + 20 > center_trim):
                 comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
-                print("LEFT")
+                # print("LEFT")
                     
-            elif (scene_info.platform[0] < center_trim):
+            elif (scene_info.platform[0] + 20 < center_trim):
                 comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
-                print("RIGHT")
+                # print("RIGHT")
+            
+            elif (abs((scene_info.platform[0] + 20) - center_trim) % 5 != 0):
+                comm.send_instruction(scene_info.frame, PlatformAction.NONE)
+                # print("NONE")
+
 
         # reset the platform to original position to gain more time for following moves
         elif (scene_info.platform[0] != 75):
@@ -104,15 +111,15 @@ def ml_loop():
                 old_ball_0 = scene_info.ball[0]
                 old_ball_1 = scene_info.ball[1]
                 comm.send_instruction(scene_info.frame, PlatformAction.MOVE_LEFT)
-                print("LEFT")
+                # print("LEFT")
             elif (scene_info.platform[0] < 75):
                 old_ball_0 = scene_info.ball[0]
                 old_ball_1 = scene_info.ball[1]
                 comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
-                print("RIGHT")
+                # print("RIGHT")
 
         else:
             old_ball_0 = scene_info.ball[0]
             old_ball_1 = scene_info.ball[1]
             comm.send_instruction(scene_info.frame, PlatformAction.NONE)
-            print("NONE")
+            # print("NONE")
