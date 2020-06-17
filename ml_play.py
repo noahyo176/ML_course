@@ -96,62 +96,62 @@ class MLPlay:
 
                             if abs(x) <= 60 and abs(y) <= 95:
                                 grid.add(2)
-                                grid.add(5)
-                                print('|||||||||||||||||')
-                                print('------AVOID------')
-                                # print('-----------')
-                                print(grid)
-                                print(self.car_pos)
-                                print("LEFT_FLAG", self.MOVE_LEFT_TAG)
-                                print("RIGHT_FLAG", self.MOVE_RIGHT_TAG)
-                                print("DESTINATION", self.DESTINATION)
-                                print("car_lane   ", self.car_lane)
-                                print("player number", self.player_no)
+                                # grid.add(5)
+                                # print('|||||||||||||||||')
+                                # print('------AVOID------')
+                                # # print('-----------')
+                                # print(grid)
+                                # print(self.car_pos)
+                                # print("LEFT_FLAG", self.MOVE_LEFT_TAG)
+                                # print("RIGHT_FLAG", self.MOVE_RIGHT_TAG)
+                                # print("DESTINATION", self.DESTINATION)
+                                # print("car_lane   ", self.car_lane)
+                                # print("player number", self.player_no)
 
             
 
             
             # log_file = '/Users/jjjjjacckk/Desktop/MLGame/games/RacingCar/log/grid.pickle'
-            log_file = '/Users/jjjjjacckk/Desktop/MLGame/games/RacingCar/log/' + '10' + '/grid'
-            seq = ['1.pickle', '2.pickle', '3.pickle', '4.pickle']
+            # log_file = '/Users/jjjjjacckk/Desktop/MLGame/games/RacingCar/log/' + '10' + '/grid'
+            # seq = ['1.pickle', '2.pickle', '3.pickle', '4.pickle']
 
-            if os.path.getsize(log_file + seq[self.player_no]) > 0:
-                try:
-                    with open(log_file + seq[self.player_no], 'rb+') as f:
-                        target = pickle.load(f)
-                    # print(target)
+            # if os.path.getsize(log_file + seq[self.player_no]) > 0:
+            #     try:
+            #         with open(log_file + seq[self.player_no], 'rb+') as f:
+            #             target = pickle.load(f)
+            #         # print(target)
 
-                except EOFError:
-                    with open(log_file + seq[self.player_no], 'rb+') as f:
-                        print(f)
-                        print(os.path.getsize(f))
-                        print(os.path.getsize(log_file))
-                        os.abort()
-            else:
-                print("file empty")
-                os.abort()
+            #     except EOFError:
+            #         with open(log_file + seq[self.player_no], 'rb+') as f:
+            #             print(f)
+            #             print(os.path.getsize(f))
+            #             print(os.path.getsize(log_file))
+            #             os.abort()
+            # else:
+            #     print("file empty")
+            #     os.abort()
 
-            with open(log_file + seq[self.player_no], 'wb') as f:
-                temp = []
-                for element in grid:
-                    temp.append(element)
-                # print(temp)
-                target.append(temp)
-                # print(target)
-                pickle.dump(target, f)
+            # with open(log_file + seq[self.player_no], 'wb') as f:
+            #     temp = []
+            #     for element in grid:
+            #         temp.append(element)
+            #     # print(temp)
+            #     target.append(temp)
+            #     # print(target)
+            #     pickle.dump(target, f)
 
             return move(grid= grid, speed_ahead = speed_ahead)
             
         def move(grid, speed_ahead): 
-            if self.player_no == 3:
-                print('-----------')
-                print(grid)
-                print(self.car_pos)
-                print("LEFT_FLAG", self.MOVE_LEFT_TAG)
-                print("RIGHT_FLAG", self.MOVE_RIGHT_TAG)
-                print("DESTINATION", self.DESTINATION)
-                print("car_lane   ", self.car_lane)
-                print("player number", self.player_no)
+            # if self.player_no == 3:
+            #     print('-----------')
+            #     print(grid)
+            #     print(self.car_pos)
+            #     print("LEFT_FLAG", self.MOVE_LEFT_TAG)
+            #     print("RIGHT_FLAG", self.MOVE_RIGHT_TAG)
+            #     print("DESTINATION", self.DESTINATION)
+            #     print("car_lane   ", self.car_lane)
+            #     print("player number", self.player_no)
             if len(grid) == 0:
                 # return ["SPEED", "MOVE_RIGHT"]
                 # if self.car_lane != self.DESTINATION and self.DESTINATION != 0:
